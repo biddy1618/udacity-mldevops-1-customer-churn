@@ -396,7 +396,7 @@ def feature_importance_plot(
 ):
     '''
     Creates and stores the feature importances in pth
-    
+
     Args:
         model: model object containing feature_importances_
         x_data: pandas dataframe of X values
@@ -453,7 +453,7 @@ def feature_importance_plot(
 def train_models(x_train, x_test, y_train, y_test):
     '''
     Train, store model results: images + scores, and store models.
-    
+
     Args:
               x_train: x training data
               x_test: x testing data

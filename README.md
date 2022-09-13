@@ -57,7 +57,7 @@ Also one can use `Dockerfile` for isolated environment.
 
 - Using `PyTest`:
 ```bash
-pytest --disable-warnings churn_script_logging_and_tests.py
+pytest --disable-warnings -vv churn_script_logging_and_tests.py
 ```
 
 - Using `ipython` shell command:

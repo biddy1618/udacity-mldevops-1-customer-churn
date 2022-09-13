@@ -22,7 +22,6 @@ MODEL_RESULT_FOLDER_PATH = os.path.join(
 MODEL_SAVE_FOLDER_PATH = os.path.join(os.path.dirname(__file__), 'models/')
 
 
-
 # categorical variables
 cat_columns = [
     'Attrition_Flag',

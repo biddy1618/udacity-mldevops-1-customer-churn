@@ -5,7 +5,7 @@ Author: Dauren Baitursyn
 Date: 08.07.22
 '''
 
-# import libraries
+# Import libraries
 import logging
 import os
 
@@ -19,11 +19,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-sns.set()
 
 import constants
 
-# configuration for logging
+sns.set()
+
+# Configuration for logging
 logging.basicConfig(
     handlers=[
         logging.FileHandler(constants.MODEL_LOGS_FILE_PATH),
@@ -33,45 +34,13 @@ logging.basicConfig(
 )
 
 
-def import_data(pth):
+def _save_barplots(df_data):
     '''
-    returns dataframe for the csv found at pth
+    Save barplots for categorical variables.
 
-    input:
-        pth: a path to the csv
-    output:
-        df_data: pandas dataframe
+    Args:
+        df_data (pd.DataFrame): Input data.
     '''
-
-    # import file as DataFrame object
-    df_data = pd.DataFrame()
-    try:
-        df_data = pd.read_csv(pth, index_col=0)
-    except FileNotFoundError as err:
-        logging.error('ERROR - File not found at specified path - "%s".', pth)
-        raise err
-    except pd.errors.ParserError as err:
-        logging.error(
-            'ERROR - Make sure that file at path - ""%s" - is in CSV format.',
-            pth)
-        raise err
-
-    logging.info('SUCCESS - reading CSV file at path - "%s".', pth)
-
-    return df_data
-
-
-def perform_eda(df_data):
-    '''
-    perform eda on df and save figures to images folder
-    input:
-        df_data: pandas dataframe
-
-    output:
-        None
-    '''
-
-    # save barplots for categorical variables
     fig, axes = plt.subplots(2, 3, figsize=(30, 10))
     for i, col in enumerate(constants.cat_columns):
         row_i = i // 3
@@ -103,7 +72,14 @@ def perform_eda(df_data):
         'SUCCESS - saved categorical variables plot at - "%s".',
         save_pth)
 
-    # save histograms for quantitative variables
+
+def _save_histograms(df_data):
+    '''
+    Save histograms for quantitative variables.
+
+    Args:
+        df_data (pd.DataFrame): Input data.
+    '''
     fig, axes = plt.subplots(5, 3, figsize=(30, 25))
     for i, col in enumerate(constants.quant_columns):
         row_i = i // 3
@@ -132,8 +108,15 @@ def perform_eda(df_data):
         'SUCCESS - saved quantitative variables plot at path - "%s".',
         save_pth)
 
-    # save distributions of 'Total_Trans_Ct' and add a smooth curve obtained
-    # using a kernel density estimate
+
+def _save_kde(df_data):
+    '''
+    Save distributions of 'Total_Trans_Ct' and add a smooth curve obtained
+    using a kernel density estimate.
+
+    Args:
+        df_data (pd.DataFrame): Input data.
+    '''
     plt.figure(figsize=(20, 10))
     plt.title('KDE plot of total transactions')
     try:
@@ -158,7 +141,14 @@ def perform_eda(df_data):
         'SUCCESS - saved KDE plot for total transactions at path - "%s".',
         save_pth)
 
-    # save correlation heatmap for all variables
+
+def _save_heatmap(df_data):
+    '''
+    Save correlation heatmap for all variables.
+
+    Args:
+        df_data (pd.DataFrame): Input data.
+    '''
     plt.figure(figsize=(20, 10))
     sns.heatmap(df_data.corr(), annot=False, cmap='Blues', linewidths=2)
     plt.title('Correlation map')
@@ -175,19 +165,71 @@ def perform_eda(df_data):
     logging.info('SUCCESS - saved correlation map at path - "%s".', save_pth)
 
 
+def import_data(pth):
+    '''
+    Returns dataframe for the CSV file found at path - pth.
+
+    Args:
+        pth (str): A path to the CSV file.
+
+    Returns:
+        df_data (pd.DataFrame): Pandas dataframe.
+    '''
+
+    # import file as DataFrame object
+    df_data = pd.DataFrame()
+    try:
+        df_data = pd.read_csv(pth, index_col=0)
+    except FileNotFoundError as err:
+        logging.error('ERROR - File not found at specified path - "%s".', pth)
+        raise err
+    except pd.errors.ParserError as err:
+        logging.error(
+            'ERROR - Make sure that file at path - ""%s" - is in CSV format.',
+            pth)
+        raise err
+
+    logging.info('SUCCESS - reading CSV file at path - "%s".', pth)
+
+    return df_data
+
+
+def perform_eda(df_data):
+    '''
+    Perform EDA on data and save figures to images folder.
+
+    Args:
+        df_data (pd.DataFrame): Data on which EDA is to be performed.
+    '''
+
+    # save barplots for categorical variables
+    _save_barplots(df_data)
+
+    # save histograms for quantitative variables
+    _save_histograms(df_data)
+
+    # save distributions of 'Total_Trans_Ct' and add a smooth curve obtained
+    # using a kernel density estimate
+    _save_kde(df_data)
+
+    # save correlation heatmap for all variables
+    _save_heatmap(df_data)
+
+
 def encoder_helper(df_data, category_lst, response):
     '''
-    helper function to turn each categorical column into a new column with
-    propotion of churn for each category - associated with cell 15 from the notebook
+    Helper function to turn each categorical column into a new column with
+    propotion of churn for each category - associated with cell 15 from the notebook.
 
-    input:
-        df_data: pandas dataframe
-        category_lst: list of columns that contain categorical features
-        response: string of response name [optional argument that
-            could be used for naming variables or index y column]
+    Args:
+        df_data (pd.DataFrame): Data.
+        category_lst (list): List of columns that contain categorical features.
+        response (str): Response name [optional argument that
+            could be used for naming variables or index y column].
 
-    output:
-        df_cat_encoded: pandas dataframe with new columns for
+    Returns:
+        df_cat_encoded (pd.DataFrame): Dataframe with new columns for
+            categorical features.
     '''
 
     # encoding categorical variables using mean target variables
@@ -211,12 +253,12 @@ def encoder_helper(df_data, category_lst, response):
 
 def perform_feature_engineering(df_data, response):
     '''
-    input:
+    Args:
         df_data: pandas dataframe
         response: string of response name [optional argument that
             could be used for naming variables or index y column]
 
-    output:
+    Returns:
         x_train: x training data
         x_test: x testing data
         y_train: y training data
@@ -267,9 +309,10 @@ def classification_report_image(
     y_test_preds_rf
 ):
     '''
-    produces classification report for training and testing results and stores report as image
-    in images folder
-    input:
+    Produces classification report for training and testing results and stores report as image
+    in images folder.
+
+    Args:
         y_train: training response values
         y_test:  test response values
         y_train_preds_lr: training predictions from logistic regression
@@ -277,12 +320,12 @@ def classification_report_image(
         y_test_preds_lr: test predictions from logistic regression
         y_test_preds_rf: test predictions from random forest
 
-    output:
+    Returns:
         None
     '''
 
     # plot random forest classifier report
-#     plt.rc('figure', figsize = (5, 5))
+    # plt.rc('figure', figsize = (5, 5))
     plt.figure(figsize=(5, 5))
     plt.text(0.01, 1.25, str('Random Forest Train'), {
              'fontsize': 10}, fontproperties='monospace')
@@ -352,14 +395,15 @@ def feature_importance_plot(
     plot_title='Feature Importance'
 ):
     '''
-    creates and stores the feature importances in pth
-    input:
+    Creates and stores the feature importances in pth
+    
+    Args:
         model: model object containing feature_importances_
         x_data: pandas dataframe of X values
         output_pth: path to store the figure
         plot_title [optional]: title for the plot, defaults to "Feature Importance"
 
-    output:
+    Returns:
         None
     '''
 
@@ -408,13 +452,14 @@ def feature_importance_plot(
 
 def train_models(x_train, x_test, y_train, y_test):
     '''
-    train, store model results: images + scores, and store models
-    input:
+    Train, store model results: images + scores, and store models.
+    
+    Args:
               x_train: x training data
               x_test: x testing data
               y_train: y training data
               y_test: y testing data
-    output:
+    Returns:
               None
     '''
 

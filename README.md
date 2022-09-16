@@ -4,9 +4,16 @@
 
 ## Project Description
 
-Project for implementing, validation and testing model for checking if client is likely to churn. Project is following best practices.
+Project for implementing, validation and testing model for checking if client is likely to churn. 
+Project is following best software engineering practices:
+* Style guide PEP8
+* Linting using `pylint` package
+* DRY principle - __Don't Repeat Yourself__ - avoid replicating code
+* SRP principle - __Single Responsibility Principle__ - one entity (function, module, etc) should have one responsibility/purpose
+* Abstract out logic for better readability
+* Testing and logging
 
-The linkting and tests results can be found at `expermentation.ipynb`.
+The linting and tests results can be found at `expermentation.ipynb`.
 
 ## Files and data description
 
@@ -50,8 +57,6 @@ The linkting and tests results can be found at `expermentation.ipynb`.
 Make sure to install requirements at `requirements.txt` using `virtualenv` or `conda` (`miniconda`) environment with Python version 3.6 (or 3.8).
 
 Also one can use `Dockerfile` for isolated environment.
-
-
 
 ### Running tests
 
